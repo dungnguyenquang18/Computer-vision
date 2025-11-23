@@ -18,14 +18,14 @@ warnings.filterwarnings('ignore')
 class CNN3DNet(nn.Module):
     """PyTorch 3D CNN Network."""
     
-    def __init__(self, in_channels: int = 4, num_classes: int = 4, input_size: int = 128):
+    def __init__(self, in_channels: int = 4, num_classes: int = 4, input_shape: Tuple[int, int, int] = (128, 128, 128)):
         """
         Initialize the 3D CNN network.
         
         Args:
             in_channels: Number of input channels
             num_classes: Number of output classes
-            input_size: Size of input (assuming cubic: input_size x input_size x input_size)
+            input_shape: Shape of input (H, W, D) - can be non-cubic
         """
         super(CNN3DNet, self).__init__()
         
@@ -45,9 +45,12 @@ class CNN3DNet(nn.Module):
         self.pool3 = nn.MaxPool3d(kernel_size=2, stride=2)
         
         # Calculate flattened size after conv layers
-        # After 3 pooling layers (each /2): input_size // 8
-        feature_size = input_size // 8
-        self.flatten_size = 128 * feature_size * feature_size * feature_size
+        # After 3 pooling layers (each /2): input_shape // 8 for each dimension
+        H, W, D = input_shape
+        feat_h = H // 8
+        feat_w = W // 8
+        feat_d = D // 8
+        self.flatten_size = 128 * feat_h * feat_w * feat_d
         
         # Fully connected layers
         self.fc1 = nn.Linear(self.flatten_size, 256)
@@ -130,9 +133,9 @@ class CNN3DModel:
         - Output layer: num_classes units, Softmax activation
         """
         in_channels = self.input_shape[3]  # Last dimension is channels
-        input_size = self.input_shape[0]  # Assuming cubic input
+        input_spatial = self.input_shape[:3]  # (H, W, D)
         self.model = CNN3DNet(in_channels=in_channels, num_classes=self.num_classes, 
-                             input_size=input_size)
+                             input_shape=input_spatial)
         self.model = self.model.to(self.device)
     
     @staticmethod
