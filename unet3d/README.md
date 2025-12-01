@@ -18,7 +18,6 @@ U-Net có kiến trúc dạng chữ U với hai nhánh chính: Encoder và Decod
 
 #### 1. **Contracting Path (Encoder - Nhánh thu hẹp):**
 
-- Giống CNN, trích xuất ngữ cảnh và giảm kích thước không gian
 - Các tầng:
   - Conv3D + ReLU
   - Conv3D + ReLU
